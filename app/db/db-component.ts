@@ -12,10 +12,10 @@ export  class  Db
   constructor(){
     this.storage = new Storage(SqlStorage);
   }
-  constructor(TblName: string, Keys: Array<string>, Types: Array<string>){
+ /* constructor(TblName: string, Keys: Array<string>, Types: Array<string>){
     this.storage = new Storage(SqlStorage);
     this.createTable(TblName, Keys, Types);
-  }
+  }*/
 
   public createTable(TblName: string, Keys: Array<string>, Types: Array<string>)
   {
@@ -36,6 +36,7 @@ export  class  Db
 
   public insertData()
   {
+    this.storage.query("DROP TABLE test");
     this.createTable('test',['key','val'],['INTEGER','TEXT']);
 
     let sql = 'INSERT INTO test (key, val) VALUES (?,?)';
@@ -50,5 +51,17 @@ export  class  Db
   public returnData()
   {
     return this.storage.query('SELECT * FROM test');
+  }
+}
+
+
+export class Element {
+  key: number;
+  val: string;
+  id: number;
+  constructor(key: number, val: string, id: number) {
+    this.key = key;
+    this.val = val;
+    this.id = id;
   }
 }
