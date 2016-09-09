@@ -17,10 +17,11 @@
   </p>
 
   <ion-list>
-  <ion-item  *ngFor="let item of elements" >
+  <ion-item  *ngFor="let item of elements"  >
         <h2>{{item.key}}</h2>
         <p>{{item.val}}</p>
          <p>{{item.id}}</p>
+    <button (click)="onClick(item.id)">CLICK</button>
   </ion-item>
 
   </ion-list>

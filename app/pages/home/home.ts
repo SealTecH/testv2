@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import {Db,Element} from '../../db/db-component'
-
+import {SecondPage} from '../secondpage/secondPage';
 @Component({
   templateUrl: 'build/pages/home/home.html'
 })
@@ -29,6 +29,10 @@ dtb: Db;
 
   }
 
+  onClick(id)
+  {
+    this.navCtrl.push(SecondPage,{id:id});
+  }
 
 
 }
