@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-navbar>
+
+    <button menuToggle ion-button class=" bar-button bar-button-default">
+      <span class="button-inner">
+        <ion-icon name="menu" class="ion-md-menu"></ion-icon>
+      </span>
+    </button>
+
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content padding>
+<h1>MODELS PAGE</h1>
+
+  <ion-list>
+    <ion-item  *ngFor="let item of Models"  >
+      <h2>{{item.Name}}</h2>
+      <p>{{item.id}}</p>
+      <button (click)="goClick($event,item.id)">CLICK</button>
+    </ion-item>
+
+  </ion-list>
+
+<!--
+
+  <ion-menu [content]="mycontent">
+    <ion-content>
+      <ion-list>
+        <button menuClose ion-item detail-none>Close Menu</button>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+-->
+
+
+</ion-content>
