@@ -1,27 +1,27 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import {Db,Element} from '../../db/db-component'
+import {DbService,Manufacturer,Model,Submodel} from '../../db/DbService'
 import {SecondPage} from '../secondpage/secondPage';
+import {Injectable} from '@angular/core'
+import {ModelPage} from "../ModelPage/ModelPage";
 @Component({
-  templateUrl: 'build/pages/home/home.html'
+  templateUrl: 'build/pages/home/home.html',
+  providers:   [DbService]
 })
 export class HomePage {
 
-elements: Element[];
-dtb: Db;
-  constructor(public navCtrl: NavController) {
+  Manufactures:Manufacturer[];
+  constructor(public navCtrl: NavController,private db: DbService) {
 
-    this.dtb = new Db();
-    this.dtb.insertData();
-     this.dtb.returnData().then(
-
+     this.db.returnManufactures().then(
        data=>{
-         this.elements = [];
+         this.Manufactures = [];
          if(data.res.rows.length>0){
            for(var i=0;i<data.res.rows.length;i++)
            {
              let item = data.res.rows.item(i);
-             this.elements.push(new Element(item.key,item.val,item.id ));
+             console.log(item);
+             this.Manufactures.push(new Manufacturer(item.Name,item.id ));
            }
          }
        }
@@ -29,9 +29,9 @@ dtb: Db;
 
   }
 
-  onClick(id)
+  onClick(event,id)
   {
-    this.navCtrl.push(SecondPage,{id:id});
+    this.navCtrl.push(ModelPage,{id:id});
   }
 
 
