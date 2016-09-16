@@ -1,18 +1,16 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import {DbService,Manufacturer,Model,Submodel} from '../../db/DbService'
-import {SecondPage} from '../secondpage/secondPage';
 import {Injectable} from '@angular/core'
 import {ModelPage} from "../ModelPage/ModelPage";
 @Component({
-  templateUrl: 'build/pages/home/home.html',
-  providers:   [DbService]
+  templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
 
   Manufactures:Manufacturer[];
   constructor(public navCtrl: NavController,private db: DbService) {
-
+      console.log("home constructor");
      this.db.returnManufactures().then(
        data=>{
          this.Manufactures = [];

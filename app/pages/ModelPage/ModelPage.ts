@@ -4,12 +4,10 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import {DbService,Manufacturer,Model,Submodel} from '../../db/DbService'
-import {SecondPage} from '../secondpage/secondPage';
 import {Injectable} from '@angular/core'
 import {SubmodelPage} from "../SubmodelPage/SubmodelPage";
 @Component({
-  templateUrl: 'build/pages/ModelPage/Model.html',
-  providers:   [DbService]
+  templateUrl: 'build/pages/ModelPage/Model.html'
 })
 export class ModelPage
 {
@@ -35,9 +33,10 @@ export class ModelPage
   }
 
 
-  goClick(event,id)
+  public onClick(event,id)
   {
-    this.navCtrl.push(SubmodelPage,{id:id});
+    console.log("model click");
+    this.navCtrl.push(SubmodelPage,{id:id,type:0});
   }
 
 }

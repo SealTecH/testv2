@@ -12,14 +12,19 @@
 </ion-header>
 
 <ion-content padding>
-  <h1>MODELS PAGE</h1>
+  <h1>SUBMODELS PAGE</h1>
 
   <ion-list>
-    <ion-item  *ngFor="let item of Models"  >
+    <ion-item  *ngFor="let item of Submodels"  >
       <h2>{{item.Name}}</h2>
       <p>{{item.id}}</p>
       <h3>{{item.Type}}</h3>
-      <h3>{{item.Desc}}</h3>
+      <h3>{{item.Description}}</h3>
+      <button (click)="onClick($event,item.id,item.Type)"  [ngSwitch]="item.Type">
+        <span *ngSwitchCase="'folder'">Show items in Folder</span>
+        <span *ngSwitchCase="'schematic'">Wiev Schematic</span>
+        <span *ngSwitchCase="'pdf'">Wiev PDF</span>
+      </button>
     </ion-item>
 
   </ion-list>

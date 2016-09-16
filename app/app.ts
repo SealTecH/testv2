@@ -8,7 +8,6 @@ import {DbService} from "./db/DbService";
 
 @Component({
   template: '<ion-nav [root]="rootPage"></ion-nav>',
-  providers: [DbService]
 })
 export class MyApp {
   rootPage: any = HomePage;
@@ -22,4 +21,4 @@ export class MyApp {
   }
 }
 
-ionicBootstrap(MyApp);
+ionicBootstrap(MyApp,[DbService]);

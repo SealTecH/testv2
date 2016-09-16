@@ -12,7 +12,9 @@ export  class  DbService
 
   constructor(){
     this.storage = new Storage(SqlStorage);
+    console.log("I was Born!");
     //this.insertData();
+    console.log("I insert data");
   }
  /* constructor(TblName: string, Keys: Array<string>, Types: Array<string>){
     this.storage = new Storage(SqlStorage);
@@ -53,7 +55,7 @@ export  class  DbService
     this.storage.query("DROP TABLE models");
     this.createTable('models',['Name','Manufacturer_id'],['TEXT','INTEGER']);
      sql = 'INSERT INTO models (Name, Manufacturer_id) VALUES (?,?)';
-    i= 0;
+     i= 0;
     let j: number = 0;
     while(i<10)
     {
@@ -69,19 +71,22 @@ export  class  DbService
 
 
     this.storage.query("DROP TABLE submodels");
-    this.createTable('submodels',['Name','Model_id','Type','Description'],['TEXT','INTEGER','TEXT','BLOB']);
-     sql = 'INSERT INTO submodels (Name, Model_id, Type, Description) VALUES (?,?,?,?)';
+    this.createTable('submodels',['Name','Model_id','Type','Description','Parent_id'],['TEXT','INTEGER','TEXT','BLOB','INTEGER']);
+     sql = 'INSERT INTO submodels (Name, Model_id, Type, Description,Parent_id) VALUES (?,?,?,?,?)';
      i = 0;
      j=0;
+    let m;
+    let p = null;
+    let type,desc = null;
     while(i<100)
     {
       while (j<10)
       {
-        let m = Math.random()*10;
-        let type,desc = null;
+         m = Math.random()*10;
         if(m<4)
         {
           type = 'folder';
+          desc = null;
         }
         else
         if(m<7)
@@ -94,8 +99,20 @@ export  class  DbService
           type = 'pdf';
           desc = 'something in pdf';
         }
-        console.log(sql, [j.toString()+" submodel",i+1,type,desc]);
-        this.storage.query(sql, [j.toString()+" submodel",i+1,type,desc]);
+        console.log(sql, ["m: "+m+" "+j.toString()+" submodel",i+1,type,desc,p]);
+        this.storage.query(sql, [j.toString()+" submodel",i+1,type,desc,p]);
+
+        if(m<4)
+        p = (i+1)*(j+1)-1;
+        else
+        {
+          m = Math.random()*10;
+          if(m<5)
+          {
+            p=null;
+          }
+        }
+
         j++;
       }
       j=0;
@@ -105,6 +122,7 @@ export  class  DbService
 
   public returnManufactures()
   {
+    console.log("start retriving manufactures");
     return this.storage.query('SELECT * FROM manufactures');
   }
 
@@ -114,15 +132,21 @@ export  class  DbService
     return this.storage.query('SELECT * FROM models WHERE Manufacturer_id = '+id);
   }
 
-  public returnModels(id:number)
+
+  public returnSubmodels(id:number,item_type: number)
   {
-    console.log('SELECT * FROM models WHERE Manufacturer_id = '+id);
-    return this.storage.query('SELECT * FROM models WHERE Manufacturer_id = '+id);
-  }
-  public returnSubmodels(id:number)
-  {
-    console.log('SELECT * FROM models WHERE Model_id = '+id);
-    return this.storage.query('SELECT * FROM models WHERE Manufacturer_id = '+id);
+
+    if(item_type ==0)
+    {
+      console.log('SELECT * FROM submodels WHERE Model_id = '+id);
+      return this.storage.query('SELECT submodels.id as id, submodels.Name as Name,submodels.Model_id as Model_id, submodels.Type as Type,  submodels.Parent_id as Parent_id,submodels.Description as Description FROM submodels WHERE Model_id = '+id);
+    }
+    else
+    {
+      console.log('SELECT * FROM submodels WHERE Parent_id = '+id);
+      return this.storage.query('SELECT submodels.id as id,submodels.Name as Name,submodels.Model_id as Model_id, submodels.Type as Type,  submodels.Parent_id as Parent_id,submodels.Description as Description FROM submodels WHERE Parent_id = '+id);
+    }
+
   }
 }
 
@@ -150,11 +174,14 @@ export class Submodel {
   Name: string;
   id: number;
   Type: string;
-  Desc: any;
-  constructor( val: string, id: number,type:string,desc:any) {
+  Parent_id: number;
+  Description:any;
+  constructor(  id: number,val: string,type:string,parent_id: number,Description:any) {/*,desc:any*/
     this.Name = val;
     this.id = id;
     this.Type = type;
-    this.Desc = desc;
+    this.Parent_id = parent_id;
+    this.Description = Description;
+    //this.Desc = desc;
   }
 }

@@ -18,11 +18,11 @@
     <ion-item  *ngFor="let item of Models"  >
       <h2>{{item.Name}}</h2>
       <p>{{item.id}}</p>
-      <button (click)="goClick($event,item.id)">CLICK</button>
+      <button (click)="onClick($event,item.id)">CLICK</button>
     </ion-item>
 
   </ion-list>
-
+<script>console.log(self.parent.context)</script>
 <!--
 
   <ion-menu [content]="mycontent">
