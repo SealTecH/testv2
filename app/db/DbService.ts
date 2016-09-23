@@ -165,7 +165,7 @@ export  class  DbService
           }
           return models;
         }
-        else return null;
+        else return models;
       }
     ));
   }
