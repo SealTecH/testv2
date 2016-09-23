@@ -5,6 +5,7 @@ import {Storage, SqlStorage} from 'ionic-angular';
 import {Type} from "../../node_modules/@angular/common/src/facade/lang";
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
+import {DelaySignature} from "../../node_modules/rxjs/src/operator/delay";
 @Injectable()
 export  class  DbService
 {
@@ -18,7 +19,7 @@ export  class  DbService
     this.storage.query("DROP TABLE Models");
     this.createTable("Users",["Username","Password"],["TEXT","TEXT"]);
     this.createTable("Subscriptions",["Ext_id","Name","User_id"],["INTEGER","TEXT","INTEGER"]);
-    this.createTable("Models",["Sub_id","Ext_id","Code","Name"],["INTEGER","INTEGER","TEXT","TEXT"]);
+    this.createTable("Models",["Sub_id","Ext_id","Code","Desc"],["INTEGER","INTEGER","TEXT","TEXT"]);
   }
 
   public createTable(TblName: string, Keys: Array<string>, Types: Array<string>)
@@ -148,11 +149,25 @@ export  class  DbService
     return this.storage.query('SELECT * FROM subscriptions WHERE User_id = ?',[UserId]);
   }
 
-  public viewModels(Sub_id:number)
+  public getModels(Sub_id:number)
   {
 
     console.log('SELECT * FROM models WHERE Sub_id = '+Sub_id);
-    return this.storage.query('SELECT * FROM models WHERE Manufacturer_id = '+id);
+    let models:Model[];
+    return Promise.resolve( this.storage.query('SELECT * FROM models WHERE Sub_id = '+Sub_id).then(
+      data=>{
+        if(data.res.rows.length>0) {
+          for(var i=0;i<data.res.rows.length;i++)
+          {
+            let item = data.res.rows.item(i);
+            console.log(item);
+            models.push(new Model(item.id,item.Ext_id,item.Sub_id,item.Code,item.Desc));
+          }
+          return models;
+        }
+        else return null;
+      }
+    ));
   }
 
 
@@ -220,12 +235,18 @@ export class Subscription {
 }
 
 export class Model {
-  Name:string;
+  Desc:string;
   id:number;
+  Sub_id:number;
+  Ext_id:number;
+  Code:string;
 
-  constructor(val:string, id:number) {
-    this.Name = val;
+  constructor(id:number,Ext_id:number,Sub_id:number,Code:string,Desc:string) {
     this.id = id;
+    this.Sub_id = Sub_id;
+    this.Ext_id = Ext_id;
+    this.Code = Code;
+    this.Desc = Desc;
   }
 }
 

@@ -5,6 +5,7 @@ import { StatusBar } from 'ionic-native';
 import { HomePage } from './pages/home/home';
 import {DbService} from "./db/DbService";
 import {LoginPage} from "./pages/LoginPage/LoginPage";
+import {User} from "./user/User";
 
 @Component({
   template: '<ion-nav [root]="rootPage"></ion-nav>',
@@ -23,4 +24,4 @@ export class MyApp {
   }
 }
 
-ionicBootstrap(MyApp,[DbService]);
+ionicBootstrap(MyApp,[DbService],[User]);

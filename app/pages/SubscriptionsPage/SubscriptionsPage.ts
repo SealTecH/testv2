@@ -13,6 +13,7 @@ import {NavParams} from "../../../node_modules/ionic-angular/components/nav/nav-
 export class SubscriptionsPage {
 
   Subscriptions:Subscription[];
+  UserId: number;
   constructor(public navCtrl: NavController,private db: DbService, navParams: NavParams) {
    let UserId =  navParams.get('UserId');
     console.log("sbbpage uid "+UserId);
