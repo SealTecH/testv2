@@ -3,13 +3,13 @@
  */
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import {DbService,Manufacturer,Model,Submodel} from '../../db/DbService'
+import {DbService,Subscription,Model,Submodel} from '../../db/DbService'
 import {Injectable} from '@angular/core'
-
 
 declare var zip: any;
 @Component({
-  templateUrl: 'build/pages/SubmodelPage/Submodel.html'
+  templateUrl: 'build/pages/SubmodelPage/Submodel.html',
+
 })
 export class SubmodelPage
 {
@@ -17,9 +17,8 @@ export class SubmodelPage
   Type: number;
   Submodels:Submodel[];
   Model_id:number;
+
   constructor(public navCtrl: NavController,private db: DbService, navParams: NavParams) {
-
-
 
     this.Model_id = navParams.get('id');
     this.Type = navParams.get('type');
@@ -49,4 +48,7 @@ export class SubmodelPage
     }
     //
   }
+
+
+
 }

@@ -3,7 +3,7 @@
  */
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import {DbService,Manufacturer,Model,Submodel} from '../../db/DbService'
+import {DbService,Subscription,Model,Submodel} from '../../db/DbService'
 import {Injectable} from '@angular/core'
 import {SubmodelPage} from "../SubmodelPage/SubmodelPage";
 @Component({
@@ -12,7 +12,7 @@ import {SubmodelPage} from "../SubmodelPage/SubmodelPage";
 export class ModelPage
 {
   Models:Model[];
-  Manufacturer_id:number;
+  Sub_id:number;
   constructor(public navCtrl: NavController,private db: DbService, navParams: NavParams) {
     this.Manufacturer_id = navParams.get('id');
     this.db.returnModels(this.Manufacturer_id).then(

@@ -4,7 +4,7 @@
 import {Storage, SqlStorage} from 'ionic-angular';
 import {Type} from "../../node_modules/@angular/common/src/facade/lang";
 import {Injectable} from '@angular/core';
-
+import {Observable} from 'rxjs/Rx';
 @Injectable()
 export  class  DbService
 {
@@ -12,14 +12,14 @@ export  class  DbService
 
   constructor(){
     this.storage = new Storage(SqlStorage);
-    console.log("I was Born!");
-    //this.insertData();
-    console.log("I insert data");
+   // this.insertData();
+  //  this.storage.query("DROP TABLE Subscriptions");
+   // this.storage.query("DROP TABLE Users");
+    this.storage.query("DROP TABLE Models");
+    this.createTable("Users",["Username","Password"],["TEXT","TEXT"]);
+    this.createTable("Subscriptions",["Ext_id","Name","User_id"],["INTEGER","TEXT","INTEGER"]);
+    this.createTable("Models",["Sub_id","Ext_id","Code","Name"],["INTEGER","INTEGER","TEXT","TEXT"]);
   }
- /* constructor(TblName: string, Keys: Array<string>, Types: Array<string>){
-    this.storage = new Storage(SqlStorage);
-    this.createTable(TblName, Keys, Types);
-  }*/
 
   public createTable(TblName: string, Keys: Array<string>, Types: Array<string>)
   {
@@ -40,22 +40,27 @@ export  class  DbService
 
   public insertData()
   {
-    this.storage.query("DROP TABLE manufactures");
-    this.createTable('manufactures',['Name'],['TEXT']);
-    var sql:string = 'INSERT INTO manufactures (Name) VALUES (?)';
+
+    this.storage.query("DROP TABLE subscriptions");
+    this.createTable('subscriptions',["Ext_id","Name","User_id"],["INTEGER","TEXT","INTEGER"]);
+    var sql:string = 'INSERT INTO subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)';
     var i: number = 0;
     while(i<10)
     {
-      console.log(sql, [i.toString()+" manufacturer"]);
-      this.storage.query(sql, [i.toString()+" manufacturer"]);
+      console.log(sql, [i.toString()+" subscription"]);
+      this.storage.query(sql, [i,i.toString()+" subscription",1]);
       i++;
     }
 
 
     this.storage.query("DROP TABLE models");
-    this.createTable('models',['Name','Manufacturer_id'],['TEXT','INTEGER']);
-     sql = 'INSERT INTO models (Name, Manufacturer_id) VALUES (?,?)';
-     i= 0;
+    this.createTable('models',['Name','Ext_id'],['TEXT','INTEGER']);
+     sql = 'INSERT INTO models (Name, Ext_id) VALUES (?,?)';
+    this.storage.query("DROP TABLE models_subscriptions");
+    this.createTable('models_subscriptions',['Model_id','Subscription_id'],['INTEGER','INTEGER']);
+    let sql2 = 'INSERT INTO models_subscriptions (Model_id, Subscription_id) VALUES (?,?)';
+    let id =null;
+    i= 0;
     let j: number = 0;
     while(i<10)
     {
@@ -63,6 +68,9 @@ export  class  DbService
       {
         console.log(sql, [j.toString()+" model",i+1]);
         this.storage.query(sql, [j.toString()+" model",i+1]);
+        id = this.last_id();
+        this.storage.query(sql2, [id,i+1]);
+
         j++;
       }
       j=0;
@@ -120,15 +128,30 @@ export  class  DbService
     }
   }
 
-  public returnManufactures()
+  public last_id()
   {
-    console.log("start retriving manufactures");
-    return this.storage.query('SELECT * FROM manufactures');
+    let id:number;
+    return Promise.resolve( this.storage.query("SELECT last_insert_rowid()").then(
+      data=>{
+        if(data.res.rows.length>0){
+          console.log(data);
+            let item = data.res.rows[0];
+          return  item["last_insert_rowid()"];
+        }
+      }
+    ));
+
+  }
+  public returnSubscriptions(UserId: number)
+  {
+    console.log("start retriving subscriptions number "+UserId);
+    return this.storage.query('SELECT * FROM subscriptions WHERE User_id = ?',[UserId]);
   }
 
-  public returnModels(id:number)
+  public viewModels(Sub_id:number)
   {
-    console.log('SELECT * FROM models WHERE Manufacturer_id = '+id);
+
+    console.log('SELECT * FROM models WHERE Sub_id = '+Sub_id);
     return this.storage.query('SELECT * FROM models WHERE Manufacturer_id = '+id);
   }
 
@@ -146,17 +169,53 @@ export  class  DbService
       console.log('SELECT * FROM submodels WHERE Parent_id = '+id);
       return this.storage.query('SELECT submodels.id as id,submodels.Name as Name,submodels.Model_id as Model_id, submodels.Type as Type,  submodels.Parent_id as Parent_id,submodels.Description as Description FROM submodels WHERE Parent_id = '+id);
     }
-
   }
+
+  public getUser(login: string,pass:string)
+  {
+    let id: number = null;
+    return Promise.resolve( this.storage.query('SELECT id FROM users WHERE Username = ? and Password = ?',[login,pass]).then(
+      data=>
+      {
+        if(data.res.rows.length>0) {
+          let item = data.res.rows[0];
+          console.log("item ");
+          console.log(item);
+          return item.id;
+        }
+      })
+    );
+}
+  public setUser(login: string,pass:string)
+  {
+    this.storage.query('INSERT INTO users (Username,Password) VALUES (?,?)',[login,pass]);
+    return this.last_id();
+  }
+
+  public addSubscriptions(answer,UserId:any)
+  {
+    let sub;
+    for(sub in answer)
+    {
+      console.log('INSERT INTO Subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)',[sub,answer[sub],UserId]);
+      this.storage.query('INSERT INTO Subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)',[sub,answer[sub],UserId]);
+    }
+    return Promise.resolve();
+  }
+
 }
 
 
-export class Manufacturer {
+export class Subscription {
   Name: string;
   id: number;
-  constructor( val: string, id: number) {
+  Ext_id: number;
+  User_id: number;
+  constructor( val: string, id: number,ext_id:number,user_id:number) {
     this.Name = val;
     this.id = id;
+    this.Ext_id = ext_id;
+    this.User_id = user_id;
   }
 }
 
@@ -182,6 +241,5 @@ export class Submodel {
     this.Type = type;
     this.Parent_id = parent_id;
     this.Description = Description;
-    //this.Desc = desc;
   }
 }

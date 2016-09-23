@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import {DbService,Manufacturer,Model,Submodel} from '../../db/DbService'
+import {DbService,Subscription,Model,Submodel} from '../../db/DbService'
 import {Injectable} from '@angular/core'
 import {ModelPage} from "../ModelPage/ModelPage";
 @Component({
@@ -8,23 +8,23 @@ import {ModelPage} from "../ModelPage/ModelPage";
 })
 export class HomePage {
 
-  Manufactures:Manufacturer[];
+  Subscriptions:Subscription[];
   constructor(public navCtrl: NavController,private db: DbService) {
-      console.log("home constructor");
-     this.db.returnManufactures().then(
+/*
+     this.db.returnSubscriptions(1).then(
        data=>{
-         this.Manufactures = [];
+         this.Subscriptions = [];
          if(data.res.rows.length>0){
            for(var i=0;i<data.res.rows.length;i++)
            {
              let item = data.res.rows.item(i);
              console.log(item);
-             this.Manufactures.push(new Manufacturer(item.Name,item.id ));
+             this.Subscriptions.push(new Subscription(item.Name,item.id,item.Ext_id ));
            }
          }
        }
      );
-
+*/
   }
 
   onClick(event,id)
