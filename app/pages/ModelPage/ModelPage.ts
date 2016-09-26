@@ -25,17 +25,16 @@ export class ModelPage
     this.db.getModels(this.Sub_id).then(data=>{
         if(data==null)
         {
-          let url = 'http://razorolog.ua.local/ezparts-mobile/models.php';
-          let body = JSON.stringify({u: user.username, p: user.pass,id:user.device_id });
-          this.http.post(url, body).subscribe(data => {
-            console.log(data);
-            let answer = data.json();
-            console.log(answer);
-            if (answer.r === 'ok') {
-
-
-            }
-          });
+          console.log("data is null");
+          let url = 'http://preview.sysonline.com/ezparts-mobile/models.php';
+          let flag= true;
+          let page = 0;
+         this.synchModels(user,url,flag,page).then((d) => {
+           console.log("adding models complete");
+           this.db.getModels(this.Sub_id).then(dt=> {
+             this.Models = dt;
+           });
+         });
         }
       else
         {
@@ -51,4 +50,31 @@ export class ModelPage
     this.navCtrl.push(SubmodelPage,{id:id,type:0});
   }
 
+  private synchModels(user,url,flag,page)
+  {
+    if(!flag||page>10)
+    {
+      console.log("flag is "+flag+" page is "+page);
+      return Promise.resolve(null);
+    }
+    let body = JSON.stringify({u: user.username, p: user.pass,id:user.device_id,f:page,sid:this.Sub_id });
+     return Promise.resolve(this.http.post(url, body).subscribe(data => {
+      console.log(data);
+      let answer = data.json();
+      console.log(answer);
+      if (answer.r === 'ok') {
+        flag = answer.more;
+        this.db.addModels(answer.m,0).then(data=>{
+          page++;
+          this.synchModels(user,url,flag,page);
+        });
+      }
+      else
+      {
+        console.log(answer);
+        flag = false;
+      }
+    })
+     );
+  }
 }

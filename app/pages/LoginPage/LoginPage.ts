@@ -24,6 +24,7 @@ export class LoginPage
   error: string;
   constructor(public navCtrl: NavController,private db: DbService,http:Http, public platform: Platform,private user:User)
   {
+
     this.http = http;
     this.device={};
     platform.ready().then(() => {
@@ -32,7 +33,7 @@ export class LoginPage
   }
 
   public onSign(login:string,pass:string) {
-    let url = 'http://razorolog.ua.local/ezparts-mobile/subscriptions.php';
+    let url = 'http://preview.sysonline.com/ezparts-mobile/subscriptions.php';
     console.log("log "+login);
     console.log("pas "+pass);
     console.log("id "+this.device['uuid']);

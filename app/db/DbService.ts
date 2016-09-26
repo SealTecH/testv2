@@ -4,8 +4,7 @@
 import {Storage, SqlStorage} from 'ionic-angular';
 import {Type} from "../../node_modules/@angular/common/src/facade/lang";
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Rx';
-import {DelaySignature} from "../../node_modules/rxjs/src/operator/delay";
+//import {DelaySignature} from "../../node_modules/rxjs/src/operator/delay";
 @Injectable()
 export  class  DbService
 {
@@ -14,7 +13,7 @@ export  class  DbService
   constructor(){
     this.storage = new Storage(SqlStorage);
    // this.insertData();
-  //  this.storage.query("DROP TABLE Subscriptions");
+   // this.storage.query("DROP TABLE Subscriptions");
    // this.storage.query("DROP TABLE Users");
     this.storage.query("DROP TABLE Models");
     this.createTable("Users",["Username","Password"],["TEXT","TEXT"]);
@@ -149,31 +148,9 @@ export  class  DbService
     return this.storage.query('SELECT * FROM subscriptions WHERE User_id = ?',[UserId]);
   }
 
-  public getModels(Sub_id:number)
-  {
-
-    console.log('SELECT * FROM models WHERE Sub_id = '+Sub_id);
-    let models:Model[];
-    return Promise.resolve( this.storage.query('SELECT * FROM models WHERE Sub_id = '+Sub_id).then(
-      data=>{
-        if(data.res.rows.length>0) {
-          for(var i=0;i<data.res.rows.length;i++)
-          {
-            let item = data.res.rows.item(i);
-            console.log(item);
-            models.push(new Model(item.id,item.Ext_id,item.Sub_id,item.Code,item.Desc));
-          }
-          return models;
-        }
-        else return models;
-      }
-    ));
-  }
-
 
   public returnSubmodels(id:number,item_type: number)
   {
-
     if(item_type ==0)
     {
       console.log('SELECT * FROM submodels WHERE Model_id = '+id);
@@ -210,13 +187,71 @@ export  class  DbService
   public addSubscriptions(answer,UserId:any)
   {
     let sub;
-    for(sub in answer)
+    for(let i=0;i<answer.length;i++)
     {
-      console.log('INSERT INTO Subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)',[sub,answer[sub],UserId]);
-      this.storage.query('INSERT INTO Subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)',[sub,answer[sub],UserId]);
+      console.log('INSERT INTO Subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)',[answer[i].id,answer[i].d,UserId]);
+      this.storage.query('INSERT INTO Subscriptions (Ext_id,Name,User_id) VALUES (?,?,?)',[answer[i].id,answer[i].d,UserId]);
     }
     return Promise.resolve();
   }
+
+
+  public addModels(answer,i)
+  {
+    return Promise.resolve(
+    this.storage.query("SELECT id  from Models WHERE Ext_id = ?",[answer[i].id]).then(data=>{
+      console.log("SELECT id  from Models WHERE Ext_id = ?",answer[i].id);
+      if(data.res.rows.length>0)
+      {
+        let  local_id =  data.res.rows[0].id;
+        console.log("UPDATE Models SET Code =?,Desc =?",[answer[i].c,answer[i].d]);
+        this.storage.query("UPDATE Models SET Code =?,Desc =?,Ext_id =? WHERE id = ?",[answer[i].c,answer[i].d,answer[i].id,local_id]).then(d =>{
+          i++;
+          if(i<answer.length)
+            this.addModels(answer,i);
+          else
+            return Promise.resolve(null);
+        });
+      }
+      else
+      {
+        console.log("INSERT INTO Models (Ext_id,Code,Desc) VALUES (?,?,?)",[answer[i].id,answer[i].c,answer[i].d]);
+        this.storage.query("INSERT INTO Models (Ext_id,Code,Desc) VALUES (?,?,?)",[answer[i].id,answer[i].c,answer[i].d]).then(d =>{
+          i++;
+          if(i<answer.length)
+            this.addModels(answer,i);
+          else
+            return Promise.resolve(null);
+        });
+      }
+    })
+  );
+  }
+
+
+
+  public getModels(Sub_id:number):Promise<Model[]>
+  {
+    console.log('SELECT * FROM Models WHERE Sub_id = '+Sub_id);
+    let models:Model[];
+    return Promise.resolve( this.storage.query('SELECT * FROM Models WHERE Sub_id = '+Sub_id).then(
+      data=>{
+        console.log("get models data ");
+        console.log(data.res.rows);
+        if(data.res.rows.length>0) {
+          for(var i=0;i<data.res.rows.length;i++)
+          {
+            let item = data.res.rows.item(i);
+            console.log(item);
+            models.push(new Model(item.id,item.Ext_id,item.Sub_id,item.Code,item.Desc));
+          }
+          return models;
+        }
+        else return Promise.resolve(null);
+      }
+    ));
+  }
+
 
 }
 

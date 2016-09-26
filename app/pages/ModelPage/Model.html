@@ -16,8 +16,11 @@
 
   <ion-list>
     <ion-item  *ngFor="let item of Models"  >
-      <h2>{{item.Name}}</h2>
-      <p>{{item.id}}</p>
+      <h2>{{item.Desc}}</h2>
+      <p>id:{{item.id}}</p>
+      <p>Ext_id:{{item.Ext_id}}</p>
+      <p>Sub_id:{{item.Sub_id}}</p>
+      <p>Code:{{item.Code}}</p>
       <button (click)="onClick($event,item.id)">CLICK</button>
     </ion-item>
 
