@@ -11,6 +11,7 @@ import {Platform} from 'ionic-angular';
 import { Http } from '@angular/http';
 import {User} from "../../user/User";
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/Rx'
 @Component({
   templateUrl: 'build/pages/ModelPage/Model.html'
 })
@@ -24,32 +25,34 @@ export class ModelPage
   values: any;
   anyErrors:any;
   finished: any;
+  status:any;
   constructor(public navCtrl: NavController,private db: DbService,private user: User,http:Http, navParams: NavParams) {
     this.Sub_id = navParams.get('id');
     this.http = http;
     this.Models = [];
 
-
-
-
-
-
-
     this.db.getModels(this.Sub_id).then(data=>{
         if(data.length==0)
         {
-        this.sb =   new Observable(observer =>{
-            console.log("data is null");
-            let flag= true;
-            let page = 0;
-            let  counter;
-            console.log("first start");
-            counter = this.test(flag,page,user,this.Sub_id);
-            observer.complete();
+          let flag= true;
+          let page = 0;
+          this.values = [];
+
+          this.data = new Observable(observer => {
+            this.test(flag,0,user,this.Sub_id);
+            observer.next(42);
+            this.test(flag,1,user,this.Sub_id);
+            observer.next(421);
+            this.test(flag,2,user,this.Sub_id);
+            observer.next(422);
           });
-          this.sb.subscribe(val=>{this.db.getModels(this.Sub_id).then(dt=> {
-            this.Models =dt;
-          });});
+          let subscription = this.data.forEach(v => this.values.push(v))
+            .then(() => { console.log("I AM ON RESULT");
+              this.db.getModels(this.Sub_id).then(dt=> {
+                this.Models = dt;
+              });
+            });
+
         }
       else
         {
@@ -57,6 +60,7 @@ export class ModelPage
         }
     });
   }
+
 
 
   public onClick(event,id)
@@ -73,6 +77,8 @@ export class ModelPage
 
 
 
+
+
  public test(flag,page,user,sub_id):Promise<any>
  {
    console.log("inside");
@@ -85,11 +91,11 @@ export class ModelPage
        flag = answer.more;
        this.db.addModels(answer.m,0,sub_id).then(data=> {
          page++;
-         if(page<15&&flag)
-         {
-           console.log("start "+page);
-           this.test(flag,page,user,sub_id);
-         }
+         //if(page<15&&flag)
+         //{
+         //  console.log("start "+page);
+         //  this.test(flag,page,user,sub_id);
+         //}
        });
       return [flag,page];
      }
