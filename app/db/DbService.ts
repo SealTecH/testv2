@@ -196,7 +196,7 @@ export  class  DbService
   }
 
 
-  public addModels(answer,i)
+  public addModels(answer,i,sub_id)
   {
     return Promise.resolve(
     this.storage.query("SELECT id  from Models WHERE Ext_id = ?",[answer[i].id]).then(data=>{
@@ -208,18 +208,18 @@ export  class  DbService
         this.storage.query("UPDATE Models SET Code =?,Desc =?,Ext_id =? WHERE id = ?",[answer[i].c,answer[i].d,answer[i].id,local_id]).then(d =>{
           i++;
           if(i<answer.length)
-            this.addModels(answer,i);
+            this.addModels(answer,i,sub_id);
           else
             return Promise.resolve(null);
         });
       }
       else
       {
-        console.log("INSERT INTO Models (Ext_id,Code,Desc) VALUES (?,?,?)",[answer[i].id,answer[i].c,answer[i].d]);
-        this.storage.query("INSERT INTO Models (Ext_id,Code,Desc) VALUES (?,?,?)",[answer[i].id,answer[i].c,answer[i].d]).then(d =>{
+        console.log("INSERT INTO Models (Sub_id,Ext_id,Code,Desc) VALUES (?,?,?,?)",[answer[i].id,answer[i].c,answer[i].d]);
+        this.storage.query("INSERT INTO Models (Sub_id,Ext_id,Code,Desc) VALUES (?,?,?,?)",[sub_id,answer[i].id,answer[i].c,answer[i].d]).then(d =>{
           i++;
           if(i<answer.length)
-            this.addModels(answer,i);
+            this.addModels(answer,i,sub_id);
           else
             return Promise.resolve(null);
         });
@@ -236,6 +236,7 @@ export  class  DbService
     let models:Model[];
     return Promise.resolve( this.storage.query('SELECT * FROM Models WHERE Sub_id = '+Sub_id).then(
       data=>{
+        models = [];
         console.log("get models data ");
         console.log(data.res.rows);
         if(data.res.rows.length>0) {
@@ -247,7 +248,7 @@ export  class  DbService
           }
           return models;
         }
-        else return Promise.resolve(null);
+        else return Promise.resolve(models);
       }
     ));
   }
